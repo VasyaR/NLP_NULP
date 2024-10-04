@@ -87,6 +87,8 @@ class NGramModel:
         for token in self.vocab:
             score = self.score_log_probs(prefix + [token])
             prob = math.exp(score)
+            # if prob > 0:
+            #     print(f"Token: {token} prob: {prob}", end=" ")
             scores.append((score, token))
             probs.append(prob)
         
@@ -163,9 +165,9 @@ def generate(args):
             print("EOF")
             # break
 
-    else:
-        print(token, end=" ")
-        sys.stdout.flush()
+        else:
+            print(token, end=" ")
+            sys.stdout.flush()
 
 def main():
     parser = argparse.ArgumentParser(description='N-gram LM')
@@ -236,12 +238,11 @@ def test_trigram_log_prob():
     doc = ["the", "cat", "sat", "on", "the", "mat"]
     vocab = ["cat", "mat", "on", "sat", "the"]
 
-    model = NGramModel(vocab, 3)
+    model = NGramModel(vocab, 3, smoothing=0.1)
     model.train(doc)
 
-    assert model.trigram_log_prob("the", "cat", "sat") == math.log(1 / 1)
-    with pytest.raises(Exception):
-        assert model.trigram_log_prob("cat", "the", "sat") == math.log(0)
+    assert model.trigram_log_prob("the", "cat", "sat") == math.log(1.1 / 1.5)
+    assert model.trigram_log_prob("cat", "the", "sat") == math.log(0.1 / 0.5)
 
 
 if __name__ == '__main__':
