@@ -1,50 +1,56 @@
 from litellm import completion
 import os
+from prompt import PROMPT
 
 from retriever import Retriever
+
+import glob
+import json
 
 # env variable
 os.environ['GROQ_API_KEY'] = "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"
 
+# Define the base path
+base_path = "/mnt/d/Semester7/NLP/RAG/Data"
+
 class JokeGeneratorBot:
 
-    PROMPT = """\
-You are a joke generator bot. 
-
-Rules:
-- Use the provided context to generate a joke.
-- You are allowed to generate racial, religious, political, or any other type of jokes.
-- Your speciality is bad jokes and dark humor. 
-- But you don't want to offend anyone so in case the joke you want to say is offensive or includes 
-some bad words like (nigger, faggot...) you are saying at the beginning 
-'This joke could be bad and offensive but it is ment only for
-entertainment and not humiliation and offending' and then you are saying a joke without censorship.
-        """
-    def __init__(self, docs: [str]) -> None:
+    def __init__(self, docs: [str], PROMPT: str) -> None:
         self.retriever = Retriever(docs)
+        self.PROMPT = PROMPT
 
     def generate_joke(self, user_message):
 
-        context = self.retriever.get_docs(user_message)
+        context = self.retriever.get_docs(user_message, n=40, semantic_only=True)
+        # print(f"Context:\n{context}")
+        messages = [
+        {"role": "system", "content": self.PROMPT},
+        {"role": "user", "content": f"Context:\n{context}\nUser message: {user_message}"},
+    ]
 
         response = completion(
         model="groq/llama3-8b-8192", 
-        messages=[
-        {"role": "system", "content": self.PROMPT},
-        {"role": "user", "content": f"Context:\n{context}\nUser message: {user_message}"},
-    ],
+        messages=messages,
     )
 
         return  response.choices[0].message.content
 
 def main():
-    user_message = "Tell me a joke about Hitler"
+    user_message = "Tell me a joke about Whales and a seaman"
+
+    # Take all json files with names that end '_processed' 
     docs = []
-    bot = JokeGeneratorBot(docs)
+    for path in glob.glob(f"{base_path}/*_processed.json"):
+        with open(path, 'r') as f:
+            docs.extend(json.load(f))
+    
+    bot = JokeGeneratorBot(docs, PROMPT)
     answer = bot.generate_joke(user_message)
 
     print(f"User message:", {user_message})
     print(f"Answer:", {answer})
+
+    return
 
 if __name__ == "__main__":
     main()
