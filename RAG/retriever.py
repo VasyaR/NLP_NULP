@@ -21,7 +21,7 @@ class Retriever:
 
         # Initialize SBERT
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        sbert = SentenceTransformer('sentence-transformers/all-distilroberta-v1', device=device)
+        self.sbert = SentenceTransformer('sentence-transformers/all-distilroberta-v1', device=device)
 
         # Load or tokenize documents
         if os.path.exists(self.tokenized_docs_path) and os.path.exists(self.bm25_path) and os.path.exists(self.sbert_embeddings_path):
