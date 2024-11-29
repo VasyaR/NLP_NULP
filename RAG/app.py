@@ -68,7 +68,7 @@ setup_demo = gr.Interface(
     inputs=[gr.Textbox(label="Enter your GROQ API Key")],
     outputs=[gr.Textbox(label="Setup Status")],
     title="Setup Joke Generator",
-    description="Initialize the Joke Generator Bot by providing the GROQ API key."
+    description="Initialize the Joke Generator Bot by providing the GROQ API key. (If there is a connection error just submit the key again. It will work.)",
 )
 
 regime_options = ["BM25 Only", "Semantic Only", "Scores Combination"]
