@@ -76,7 +76,7 @@ joke_demo = gr.Interface(
     fn=generate_joke_interface,
     inputs=[
         gr.Textbox(label="Enter your message"),
-        gr.Radio(choices=regime_options, label="Choose Regime"),
+        gr.Radio(choices=regime_options, label="Choose Regime", value="Scores Combination"),
         gr.Slider(minimum=0, maximum=1, step=0.01, value=0.75, label="BM25 Coefficient"),
     ],
     outputs=[
@@ -84,7 +84,7 @@ joke_demo = gr.Interface(
         gr.Dataframe(headers=["Key", "Value"], label="Context"),
     ],
     title="Joke Generator",
-    description="Generate jokes based on your input message. Select a retrieval regime and view the context used.\
+    description="Generate jokes based on your input message(Only in English :( )). Select a retrieval regime and view the context used.\
                 Be careful, the jokes can be offensive! Try to write a message that is related to the joke you want to hear.\
                 (tell me a joke and its title about... or tell me a one liner about...). Sometimes bot works bad :(\
                 In this case, try to rewrite a message and send again. Or close the window and enter\
