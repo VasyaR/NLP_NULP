@@ -9,7 +9,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 
 # Define the base path
-base_path = "/mnt/d/Semester7/NLP/RAG/Data"
+base_path = "./Data" # "/mnt/d/Semester7/NLP/RAG/Data"
 
 class Retriever:
 
@@ -20,7 +20,8 @@ class Retriever:
         self.sbert_embeddings_path = os.path.join(base_path, "embeddings_parts")
 
         # Initialize SBERT
-        self.sbert = SentenceTransformer('sentence-transformers/all-distilroberta-v1')
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        sbert = SentenceTransformer('sentence-transformers/all-distilroberta-v1', device=device)
 
         # Load or tokenize documents
         if os.path.exists(self.tokenized_docs_path) and os.path.exists(self.bm25_path) and os.path.exists(self.sbert_embeddings_path):
@@ -56,7 +57,6 @@ class Retriever:
             pickle.dump(self.bm25, f)
         split_size = 1000  # Number of rows per split
         embeddings_size = self.sbert_embeddings.size(0)
-        # print(sbert_embeddings[0:5].shape)
 
         # Split and save the tensor
         for i in range(0, embeddings_size, split_size):
@@ -88,7 +88,7 @@ class Retriever:
         self.sbert_embeddings = torch.cat(loaded_parts, dim=0)
         print("SBERT embeddings loaded")
 
-    def get_docs(self, user_message: str, n: int = 40, bm25_only: bool = False, semantic_only: bool = False, scores_combination: bool = True) -> [str]:
+    def get_docs(self, user_message: str, n: int = 30, bm25_only: bool = False, semantic_only: bool = False, scores_combination: bool = True, bm_koef: float = 0.75) -> [str]:
         # In case of BM25 only, return the top n documents based on BM25 scores, if somebody sets a couple
         # of flags to True, the func will return the top n documents based on the first flag set to True
 
@@ -107,20 +107,14 @@ class Retriever:
             print("Combination")
             bm_scores = self._get_bm25_scores(user_message)
             semantic_scores = self.get_semantic_scores(user_message)
-            scores = torch.tensor(0.3 * bm_scores) + 0.7 * semantic_scores
+            scores = torch.tensor(bm_koef * bm_scores) + (1 - bm_koef) * semantic_scores
 
         # Sort the documents by their BM25 scores in descending order
         sorted_doc_indices = np.argsort(scores)
 
-        # print("Scores:", [scores[i] for i in sorted_doc_indices[:-n]])
-
-        # for i in range(5):
-        #     print(f"Score-{i}: {scores[sorted_doc_indices[-i]]}")
-        #     print(f"Doc-{i}: {self.docs[sorted_doc_indices[-i]]}")
-
         result_docs = [self.docs[i] for i in sorted_doc_indices[-n:] if scores[i] > 0]
 
-        return result_docs
+        return result_docs[::-1] # Return the top n documents in descending order which means the most relevant documents are first
     
     def _get_bm25_scores(self, user_message: str) -> np.array:
         tokenized_user_message = tokenize_text(user_message)
