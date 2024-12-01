@@ -15,8 +15,8 @@ Semantic embeddings are stored partically to avoid RAM overusing. However even t
 For tokenization I used lowercasing + NLTK library(It's usage is in tokenizing.py file). 
 In LLM_usage.py it is described the logic of retrieving responces from 'groq/llama3-8b-8192'. 
 I have considered to not use reranker because of lack of time mostly :( I will probably implement it later 
-This project is not working perfectly, I consider that finetuning the model with my dataset using LORA or other methods could show
-better results
+This project is not working perfectly, I consider that finetuning the model with my dataset using LORA or other methods could show better results
+Also I should change the logic, so that there will be 1 tab, and API key will be inder message so user MUST enter key)
 
 Using instructions
 python 3.10.12 or higher
