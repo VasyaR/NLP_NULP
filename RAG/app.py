@@ -30,7 +30,8 @@ def initialize_bot(api_key):
                 docs.extend(json.load(f))
 
     # Initialize the bot
-    bot = JokeGeneratorBot(docs, PROMPT)
+    if bot is None:
+        bot = JokeGeneratorBot(docs, PROMPT)
 
 # Function to handle joke generation
 def generate_joke_interface(user_message, regime, bm_koef):
