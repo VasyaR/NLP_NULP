@@ -92,6 +92,9 @@ class Retriever:
         # In case of BM25 only, return the top n documents based on BM25 scores, if somebody sets a couple
         # of flags to True, the func will return the top n documents based on the first flag set to True
 
+        # remove "tell me a joke about" ot "tell me a joke and its title about" from the user message
+        user_message = user_message.replace("tell me a joke about", "").replace("tell me a joke and its title about", "")
+
         if bm25_only:
             semantic_only = False
             scores_combination = False

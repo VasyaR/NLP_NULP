@@ -15,17 +15,18 @@ tokenized_docs_path = os.path.join(base_path, "tokenized_docs.pkl")
 
 # Take all json files with names that end '_processed'  
 for path in glob.glob(f"{base_path}/*_processed.json"):
+    print(path)
     with open(path, 'r') as f:
         docs.extend(json.load(f))
     
 index = 0
 
-for i, doc in enumerate(docs):
-    if 'body' in doc:
-        if doc['body'] == "I don't fuck the sandwich before eating it":
-            tokenized_doc = tokenize_doc(doc)
-            print(tokenized_doc)
-            index = i
+# for i, doc in enumerate(docs):
+#     if 'body' in doc:
+#         if doc['body'] == "I don't fuck the sandwich before eating it":
+#             tokenized_doc = tokenize_doc(doc)
+#             print(tokenized_doc)
+#             index = i
 
 with open(bm25_path, 'rb') as f:
     bm25 = pickle.load(f)
@@ -39,7 +40,7 @@ with open(bm25_path, 'rb') as f:
 # with open(bm25_path, 'wb') as f:
 #     pickle.dump(bm25, f)
 
-message = "tell me a joke about I don't fuck the sandwich before eating it"
+message = "tell me a joke about sandwich before eating it"
 tokenized_message = tokenize_text(message)
 print(tokenized_message)
 scores = torch.tensor(bm25.get_scores(tokenized_message))
@@ -48,6 +49,7 @@ sorted_doc_indices = np.argsort(scores)
 for i in range(1, 2):
     print("Score:", scores[sorted_doc_indices[-i]] )
     print(docs[sorted_doc_indices[-i]])
+    print("Doc number:", sorted_doc_indices[-i])
 
 # result_docs = [docs[i] for i in sorted_doc_indices[-30:] if scores[i] > 0]
 

@@ -19,9 +19,13 @@ def initialize_bot(api_key):
     # Set the API key
     os.environ['GROQ_API_KEY'] = api_key
 
+    pathes = ["./Data/hate_speech_processed.json", "./Data/reddit_jokes2_processed.json", 
+              "./Data/stupidstuff_processed.json", "./Data/wocka_processed.json", 
+              "./Data/reddit_jokes1_processed.json"]
+
     # Load documents (done once)
     if not docs:  # Only load if docs are not already loaded
-        for path in glob.glob(f"{base_path}/*_processed.json"):
+        for path in pathes:
             with open(path, 'r') as f:
                 docs.extend(json.load(f))
 
@@ -68,7 +72,11 @@ setup_demo = gr.Interface(
     inputs=[gr.Textbox(label="Enter your GROQ API Key")],
     outputs=[gr.Textbox(label="Setup Status")],
     title="Setup Joke Generator",
-    description="Initialize the Joke Generator Bot by providing the GROQ API key. (If there is a connection error just submit the key again. It will work.)",
+    description="Initialize the Joke Generator Bot by providing the GROQ API key. \
+        (If there is a connection error(on this or next tab) reload the page, wait 5-10 imnutes, \
+        reload the page again and reinitialize the joke generator with the API KEY)\
+        If you see some runtime error like memory limit exceeded, tell me on mail: vasyarusynb@gmail.com(I can see your email not so fast)\
+        or tg: @Beav3rrr and I will redeploy or turn on new instance",
 )
 
 regime_options = ["BM25 Only", "Semantic Only", "Scores Combination"]
@@ -86,9 +94,8 @@ joke_demo = gr.Interface(
     title="Joke Generator",
     description="Generate jokes based on your input message(Only in English :( )). Select a retrieval regime and view the context used.\
                 Be careful, the jokes can be offensive! Try to write a message that is related to the joke you want to hear.\
-                (tell me a joke and its title about... or tell me a one liner about...). Sometimes bot works bad :(\
-                In this case, try to rewrite a message and send again. Or close the window and enter\
-                the link again, after reinitialize joke generator with API KEY.\
+                (tell me a joke and its title about... or tell me a joke and its title about... it should be a oneliner, dark, pervy, etc.). Sometimes bot works bad :(\
+                In this case, try to rewrite a message and send again.\
                 Or try to change the regime or BM25 Coefficient.\
                 BM25 Coefficient is used to balance the BM25 and semantic scores(It is active only in Scores Combination mode). Semantic scores are multiplied by (1 - BM25 Coefficient).\
                 If you want to use only BM25 or semantic scores, select the corresponding regime or set it to 0.0 or 1.0. respectively.",
@@ -103,5 +110,5 @@ demo = gr.TabbedInterface(
 )
 
 # Launch the interface
-# demo.launch()
-demo.launch(share=True)
+demo.launch()
+# demo.launch(share=True)
